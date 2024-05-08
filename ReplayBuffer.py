@@ -4,11 +4,11 @@ class ReplayBuffer(object):
     def __init__(self, max_size, input_shape):
         self.buffer_size = max_size
         self.count = 0
-        self.states = np.zeros((self.buffer_size, input_shape[0])) 
-        self.actions = np.zeros((self.buffer_size, input_shape[1]))
-        self.rewards = np.zeros((self.buffer_size))
-        self.new_states = np.zeros((self.buffer_size, input_shape[0]))
-        self.terminal = np.zeros(self.buffer_size, dtype=np.float32)
+        self.states = np.zeros((self.buffer_size, input_shape[0]), dtype=np.float32) 
+        self.actions = np.zeros((self.buffer_size, input_shape[1]), dtype=np.float32)
+        self.rewards = np.zeros((self.buffer_size), dtype=np.float32)
+        self.new_states = np.zeros((self.buffer_size, input_shape[0]), dtype=np.float32)
+        self.terminal = np.zeros(self.buffer_size)
 
     def add_sample(self, state, action, reward, new_state, done):
         index = self.count % self.buffer_size
