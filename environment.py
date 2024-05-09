@@ -1,7 +1,7 @@
 import numpy as np
 
 class Environment(object):
-    def __init__(self, state, mu, m, g, thetamin = 0, thetamax = np.pi, phimin = 0, phimax = 2*np.pi, Tmin = 0, Tmax = 20, dt = 0.02, dphi = 1/np.pi, dtheta = 1/np.pi):
+    def __init__(self, state, mu, m, g, thetamin = 0, thetamax = np.pi, phimin = 0, phimax = 2*np.pi, Tmin = 0, Tmax = 20, dT = 1, dt = 0.02, dphi = 1/np.pi, dtheta = 1/np.pi):
         self.mu = mu
         self.m = m
         self.g = g
@@ -11,6 +11,7 @@ class Environment(object):
         self.phimax = phimax
         self.Tmin = Tmin
         self.Tmax = Tmax
+        self.dT = dT
         self.dt = dt
         self.dtheta = dtheta
         self.dphi = dphi
@@ -46,12 +47,12 @@ class Environment(object):
         return [[xn, vxn, yn, vyn, zn, vzn], reward, done]
     
     def actionspace(self):
-        num_steps_T = int((self.Tmax - self.Tmin) / self.dt) + 1
+        num_steps_T = int((self.Tmax - self.Tmin) / self.dT) + 1
         num_steps_phi = int((self.phimax - self.phimin) / self.dphi) + 1
         num_steps_theta = int((self.thetamax - self.thetamin) / self.dtheta) + 1
 
 
-        T_values = [self.Tmin + i * self.dt for i in range(num_steps_T)]
+        T_values = [self.Tmin + i * self.dT for i in range(num_steps_T)]
         phi_values = [self.phimin + i * self.dphi for i in range(num_steps_phi)]
         theta_values = [self.thetamin + i * self.dtheta for i in range(num_steps_theta)]
 
