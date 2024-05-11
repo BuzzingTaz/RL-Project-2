@@ -20,31 +20,45 @@ class Environment(object):
     def reset(self):
         self.state = np.array([0, 1, 0, -1, 0, 0])
     
-    def infostep(self, current_step, action):
+    def next_state(self, action):
         x, vx, y, vy, z, vz = self.state
         T, phi, theta = action
-        
+
         ax = (-0.7071 * np.cos(phi) * np.sin(theta) - 0.7071 * np.sin(phi)) * T / self.m
-        ay = (-0.7071 * np.cos(phi) * np.sin(theta) - 0.7071 * np.sin(phi)) * T / self.m
+        ay = ax
         az = self.g - (np.cos(phi) * np.cos(theta)) * T / self.m
 
-        vxn = vx + (ax - self.mu * vx) * (self.dt)
-        vyn = vy + (ay - self.mu * vy) * (self.dt)
-        vzn = vz + (az - self.mu * vz) * (self.dt)
+        vxn = vx + (ax - self.mu * vx) * (self.dt / 2)
+        vyn = vy + (ay - self.mu * vy) * (self.dt / 2)
+        vzn = vz + (az - self.mu * vz) * (self.dt / 2)
 
         xn = x + vxn * self.dt
         yn = y + vyn * self.dt
         zn = z + vzn * self.dt
 
-        # vxn = vx + (ax - self.mu * vx) * (self.dt / 2)
-        # vyn = vy + (ay - self.mu * vy) * (self.dt / 2)
-        # vzn = vz + (az - self.mu * vz) * (self.dt / 2)
+        vxn = vx + (ax - self.mu * vx) * (self.dt / 2)
+        vyn = vy + (ay - self.mu * vy) * (self.dt / 2)
+        vzn = vz + (az - self.mu * vz) * (self.dt / 2)
 
-        # reward=0.5* -np.sqrt((x - 5 * np.cos(1.2 * self.current_step * self.dt))**2 + (y - 5 * np.sin(1.2 * self.current_step * self.dt))**2 + (z + 20)**2)+0.3 * np.sqrt((vx+6 * np.sin(1.2 * self.current_step * self.dt))**2 + (vy-6*np.cos(1.2 * self.current_step * self.dt))**2 + vz**2)
-        reward = -np.sqrt((xn - 5 * np.cos(1.2 * current_step * self.dt))**2 + (yn - 5 * np.sin(1.2 * current_step * self.dt))**2 + (zn + 20)**2)
-        done = zn < -50 
         self.state = np.array([xn, vxn, yn, vyn, zn, vzn])
-        return [[x, vx, y, vy, z, vz],[xn, vxn, yn, vyn, zn, vzn], reward, done]
+        done = zn < -25
+        
+        return [[x, vx, y, vy, z, vz],[xn, vxn, yn, vyn, zn, vzn], done]
+
+
+    def reward1(self):
+        x, vx, y, vy, z, vz = self.state
+        
+        reward1 = -(np.sqrt((x - 5)**2 + y**2 + (z + 20)**2))
+        
+        return reward1
+    
+    def infostep(self, current_step, alpha, beta):
+        x, vx, y, vy, z, vz = self.state
+        
+        reward2 = - (alpha*(np.sqrt((x - 5*np.cos(1.2*(current_step)*self.dt))**2 + (y - 5 * np.sin(1.2*(current_step)*self.dt))**2 + (z + 20)**2)) + beta*(np.sqrt((vx + 6*np.sin(1.2*(current_step)*self.dt))**2 + (vy - 6*np.cos(1.2*(current_step)*self.dt))**2 + vz**2)) )
+        
+        return reward2
     
     def actionspace(self):
         num_steps_T = int((self.Tmax - self.Tmin) / self.dT) + 1
