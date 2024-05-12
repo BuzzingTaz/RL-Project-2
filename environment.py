@@ -50,10 +50,12 @@ class Environment(object):
         x, vx, y, vy, z, vz = self.state
         
         reward1 = -(np.sqrt((x - 5)**2 + y**2 + (z + 20)**2))
-        
+        if(reward1 == 0):
+            reward1 += 100000
+            done = True
         return reward1
     
-    def infostep(self, current_step, alpha, beta):
+    def reward2(self, current_step, alpha, beta):
         x, vx, y, vy, z, vz = self.state
         
         reward2 = - (alpha*(np.sqrt((x - 5*np.cos(1.2*(current_step)*self.dt))**2 + (y - 5 * np.sin(1.2*(current_step)*self.dt))**2 + (z + 20)**2)) + beta*(np.sqrt((vx + 6*np.sin(1.2*(current_step)*self.dt))**2 + (vy - 6*np.cos(1.2*(current_step)*self.dt))**2 + vz**2)) )
